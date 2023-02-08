@@ -39,4 +39,5 @@ export class DevisController {
   remove(@Param('id') id: string) {
     return this.devisService.remove(+id);
   }
+  //test
 }
