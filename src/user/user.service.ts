@@ -5,22 +5,54 @@ import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UserService {
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    console.log('createUserDto', createUserDto);
+    try {
+      return 'This action adds a new user';
+    } catch (error) {
+      console.log('error', error);
+    } finally {
+      console.log('finally');
+    }
   }
 
   findAll() {
-    return `This action returns all user`;
+    try {
+      return `This action returns all user`;
+    } catch (error) {
+      console.log('error', error);
+    } finally {
+      console.log('finally');
+    }
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    try {
+      return `This action returns a #${id} user`;
+    } catch (error) {
+      console.log('error', error);
+    } finally {
+      console.log('finally');
+    }
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    console.log('updateUserDto', updateUserDto);
+    try {
+      return `This action updates a #${id} user`;
+    } catch (error) {
+      console.log('error', error);
+    } finally {
+      console.log('finally');
+    }
   }
 
   remove(id: number) {
-    return `This action removes a #${id} user`;
+    try {
+      return `This action removes a #${id} user`;
+    } catch (error) {
+      console.log('error', error);
+    } finally {
+      console.log('finally');
+    }
   }
 }

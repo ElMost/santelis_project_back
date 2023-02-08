@@ -1,4 +1,6 @@
+import { IsDate } from 'class-validator';
 import { User } from 'src/user/entities/user.entity';
+// import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
   Column,
@@ -16,6 +18,7 @@ export class Reservation {
   nomDesServices: string;
 
   @Column()
+  @IsDate()
   date: Date;
 
   @Column()

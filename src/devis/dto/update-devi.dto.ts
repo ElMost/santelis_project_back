@@ -1,4 +1,19 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateDeviDto } from './create-devi.dto';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
-export class UpdateDeviDto extends PartialType(CreateDeviDto) {}
+export class UpdateDevisDto {
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+
+  @IsString()
+  @IsNotEmpty()
+  nomDesServices: string;
+
+  @IsString()
+  @IsNotEmpty()
+  frequence: string;
+
+  @IsString()
+  @IsOptional()
+  UserId: string;
+}

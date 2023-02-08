@@ -5,22 +5,46 @@ import { UpdateServiceDto } from './dto/update-service.dto';
 @Injectable()
 export class ServicesService {
   create(createServiceDto: CreateServiceDto) {
-    return 'This action adds a new service';
+    try {
+      console.log('createServiceDto', createServiceDto);
+
+      return 'This action adds a new service';
+    } catch (error) {
+      console.log('error', error);
+    }
   }
 
   findAll() {
-    return `This action returns all services`;
+    try {
+      return `This action returns all services`;
+    } catch (error) {
+      console.log('error', error);
+    }
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} service`;
+    try {
+      return `This action returns a #${id} service`;
+    } catch (error) {
+      console.log('error', error);
+    }
   }
 
   update(id: number, updateServiceDto: UpdateServiceDto) {
-    return `This action updates a #${id} service`;
+    try {
+      console.log('updateServiceDto', updateServiceDto);
+
+      return `This action updates a #${id} service`;
+    } catch (error) {
+      console.log('error', error);
+    }
   }
 
   remove(id: number) {
-    return `This action removes a #${id} service`;
+    try {
+      return `This action removes a #${id} service`;
+    } catch (error) {
+      console.log('error', error);
+    }
   }
 }
