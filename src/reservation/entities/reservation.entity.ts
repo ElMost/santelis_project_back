@@ -24,7 +24,7 @@ export class Reservation {
   @Column()
   heure: string;
 
-  @ManyToOne(() => User, (user) => user.reservation, {
+  @ManyToOne(() => User, user => user.reservation, {
     onDelete: 'CASCADE',
     nullable: false,
     eager: true,

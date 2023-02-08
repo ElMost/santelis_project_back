@@ -18,7 +18,7 @@ export class Devis {
   @Column()
   frequence: string;
 
-  @ManyToOne(() => User, (User) => User.devis, {
+  @ManyToOne(() => User, User => User.devis, {
     onDelete: 'CASCADE',
     nullable: false,
     eager: true,

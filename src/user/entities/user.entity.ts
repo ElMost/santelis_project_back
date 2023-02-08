@@ -30,11 +30,11 @@ export class User {
 
   @OneToMany(
     () => Reservation,
-    (reservationDeServices) => reservationDeServices.User,
+    reservationDeServices => reservationDeServices.User,
   )
   reservationDeServices: Reservation[];
 
-  @OneToMany(() => Devis, (devis) => devis.User, {
+  @OneToMany(() => Devis, devis => devis.User, {
     onDelete: 'CASCADE',
   })
   devis: Devis[];
