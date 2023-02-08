@@ -2,9 +2,13 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
+import { DevisModule } from './devis/devis.module';
+import { ServicesModule } from './services/services.module';
+import { ReservationModule } from './reservation/reservation.module';
 import { ReservationModule } from './reservation/reservation.module';
 import { ServicesModule } from './services/services.module';
 import { DevisModule } from './devis/devis.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [UserModule, ReservationModule, ServicesModule, DevisModule],
