@@ -1,10 +1,6 @@
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
-export class UpdateDevisDto {
-  @IsString()
-  @IsNotEmpty()
-  id: string;
-
+export class CreateDevisDto {
   @IsString()
   @IsNotEmpty()
   nomDesServices: string;
@@ -12,8 +8,4 @@ export class UpdateDevisDto {
   @IsString()
   @IsNotEmpty()
   frequence: string;
-
-  @IsString()
-  @IsOptional()
-  UserId: string;
 }

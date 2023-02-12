@@ -20,7 +20,7 @@ export class Devis {
 
   @ManyToOne(() => User, User => User.devis, {
     onDelete: 'CASCADE',
-    nullable: false,
+    // nullable: false,
     eager: true,
   })
   @JoinColumn({ name: 'UserId' })

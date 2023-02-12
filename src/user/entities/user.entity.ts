@@ -1,4 +1,4 @@
-import { Devis } from 'src/devis/entities/devi.entity';
+import { Devis } from 'src/devis/entities/devis.entity';
 import { Reservation } from 'src/reservation/entities/reservation.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
@@ -28,15 +28,16 @@ export class User {
   })
   password: string;
 
-  @OneToMany(
-    () => Reservation,
-    reservationDeServices => reservationDeServices.User,
-  )
-  reservationDeServices: Reservation[];
+  @Column({
+    nullable: true,
+  })
+  refreshToken: string;
+
+  @OneToMany(() => Reservation, reservation => reservation.User)
+  reservation: Reservation[];
 
   @OneToMany(() => Devis, devis => devis.User, {
     onDelete: 'CASCADE',
   })
   devis: Devis[];
-  reservation: any;
 }

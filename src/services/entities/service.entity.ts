@@ -1,4 +1,4 @@
-import { Devis } from 'src/devis/entities/devi.entity';
+import { Devis } from 'src/devis/entities/devis.entity';
 import { Reservation } from 'src/reservation/entities/reservation.entity';
 import {
   Entity,
@@ -17,8 +17,8 @@ export class Service {
   @Column()
   nomDesServices: string;
 
-  @Column()
-  type: string;
+  // @Column()
+  // type: string;
 
   @IsOptional()
   @ManyToMany(() => Devis, { eager: false })

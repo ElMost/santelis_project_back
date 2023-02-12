@@ -9,7 +9,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
-import { Devis } from './devis/entities/devi.entity';
+import { Devis } from './devis/entities/devis.entity';
 import { Reservation } from './reservation/entities/reservation.entity';
 import { Service } from './services/entities/service.entity';
 import { User } from './user/entities/user.entity';

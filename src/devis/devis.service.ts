@@ -1,50 +1,88 @@
 import { Injectable } from '@nestjs/common';
-import { CreateDeviDto } from './dto/create-devi.dto';
-import { UpdateDevisDto } from './dto/update-devi.dto';
-// import { UpdateDevisDto, UpdateDevisDto } from './dto/update-devi.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { FileWatcherEventKind } from 'typescript';
+import { CreateDevisDto } from './dto/create-devis.dto';
+import { UpdateDevisDto } from './dto/update-devis.dto';
+import { Devis } from './entities/devis.entity';
 
 @Injectable()
 export class DevisService {
-  create(createDeviDto: CreateDeviDto) {
+  constructor(
+    @InjectRepository(Devis)
+    private devisRepository: Repository<Devis>,
+  ) {}
+
+  async create(createDevisDto: CreateDevisDto) {
     try {
-      console.log('createDeviDto', createDeviDto);
-      return 'This action adds a new devi';
+      const newDevis = this.devisRepository.create(createDevisDto);
+      const savedDevis = await this.devisRepository.save(newDevis);
+      console.log('Le devis a été créé avec succès :', savedDevis);
+      return savedDevis;
     } catch (error) {
-      console.log('error', error);
+      console.log('Erreur lors de la création du devis :', error);
+      throw new Error('Impossible de créer le devis');
     }
   }
 
-  findAll() {
+  async findAll() {
     try {
-      return `This action returns all devis`;
+      const devis = await this.devisRepository.find({ relations: ['User'] });
+      return devis;
     } catch (error) {
-      console.log('error', error);
+      console.log('Erreur lors de la récupération des devis :', error);
+      throw new Error('Impossible de récupérer les devis');
     }
   }
 
-  findOne(id: number) {
+  async findOne(id: string) {
     try {
-      return `This action returns a #${id} devi`;
+      const devis = await this.devisRepository.findOne({
+        where: { id },
+        relations: ['User'],
+      });
+
+      if (!devis) {
+        throw new Error(`Devis avec l'ID ${id} introuvable`);
+      }
+      return devis;
     } catch (error) {
-      console.log('error', error);
+      console.log('Erreur lors de la récupération du devis :', error);
+      throw new Error(`Impossible de récupérer le devis avec l'ID ${id}`);
     }
   }
 
-  update(id: number, updateDeviDto: UpdateDevisDto) {
+  async update(id: string, updateDevisDto: UpdateDevisDto) {
     try {
-      console.log('updateDeviDto', updateDeviDto);
-
-      return `This action updates a #${id} devi`;
+      const devis = await this.devisRepository.findOne({ where: { id } });
+      if (!devis) {
+        throw new Error(`Devis avec l'ID ${id} introuvable`);
+      }
+      const updatedDevis = await this.devisRepository.save({
+        ...devis,
+        ...updateDevisDto,
+      });
+      console.log('Le devis a été mis à jour avec succès :', updatedDevis);
+      return updatedDevis;
     } catch (error) {
-      console.log('error', error);
+      console.log('Erreur lors de la mise à jour du devis :', error);
+      throw new Error(`Impossible de mettre à jour le devis avec l'ID ${id}`);
     }
   }
 
-  remove(id: number) {
+  async delete(id: string) {
     try {
-      return `This action removes a #${id} devi`;
+      const devis = await this.devisRepository.findOne({ where: { id } });
+
+      if (!devis) {
+        throw new Error(`Devis avec l'ID ${id} introuvable`);
+      }
+      const deletedDevis = await this.devisRepository.delete(id);
+      console.log('Le devis a été supprimé avec succès :', deletedDevis);
+      return deletedDevis;
     } catch (error) {
-      console.log('error', error);
+      console.log('Erreur lors de la suppression du devis :', error);
+      throw new Error(`Impossible de supprimer le devis avec l'ID ${id}`);
     }
   }
 }
