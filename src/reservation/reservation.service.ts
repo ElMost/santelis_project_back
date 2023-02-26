@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { error } from 'console';
+import { User } from 'src/user/entities/user.entity';
+import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
@@ -11,19 +12,27 @@ export class ReservationService {
   constructor(
     @InjectRepository(Reservation)
     private reservationRepository: Repository<Reservation>,
+    @Inject(UserService)
+    private userRepository: UserService,
   ) {}
   async create(createReservationDto: CreateReservationDto) {
     try {
-      console.log('createReservationDto', createReservationDto);
-      const newReservation = await this.reservationRepository.create(
-        createReservationDto,
+      // console.log('createReservationDto', createReservationDto);
+      const user = await this.userRepository.findOneByEmail(
+        createReservationDto.email,
       );
-      console.log('newReservation', newReservation);
+
+      const newReservation = this.reservationRepository.create({
+        ...createReservationDto,
+        User: user,
+      });
+      // console.log('newReservation', newReservation);
       const savedReservation = await this.reservationRepository.save(
         newReservation,
       );
+
       console.log('savedReservation', savedReservation);
-      return savedReservation;
+      return newReservation;
     } catch (error) {
       console.log('error', error);
     }
@@ -49,10 +58,15 @@ export class ReservationService {
         relations: ['User'],
       });
       if (!reservation) {
-        throw new Error(`Reservation avec l'ID ${id} introuvable`);
+        return {
+          message: `Reservation avec l'ID ${id} introuvable`,
+          error: 404,
+        };
       }
-      console.log('reservation', reservation);
-      return reservation;
+      //  console.log('reservation', reservation);
+      else {
+        return reservation;
+      }
     } catch (error) {
       console.log('error', error);
       throw new Error(`Reservation avec l'ID ${id} introuvable`);
@@ -101,5 +115,8 @@ export class ReservationService {
       console.log('Erreur lors de la suppression de la reservation', error);
       throw new Error(`Reservation avec l'ID ${id} introuvable`);
     }
+  }
+  async getAllByEmail(email: string): Promise<Reservation[]> {
+    return this.reservationRepository.find({ where: { email: email } });
   }
 }

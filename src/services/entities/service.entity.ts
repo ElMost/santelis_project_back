@@ -17,8 +17,8 @@ export class Service {
   @Column()
   nomDesServices: string;
 
-  // @Column()
-  // type: string;
+  @Column()
+  type: string;
 
   @IsOptional()
   @ManyToMany(() => Devis, { eager: false })

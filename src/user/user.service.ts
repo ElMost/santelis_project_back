@@ -10,15 +10,15 @@ import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { User } from './entities/user.entity';
-import { compare } from 'bcrypt';
+// import { compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { LoginUserDto } from './dto/login-user.dto';
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    private readonly jwtService: JwtService,
+    private userRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
 
   async registerUser(createUserDto: CreateUserDto) {
@@ -32,6 +32,7 @@ export class UserService {
     user.prenom = prenom;
     user.email = email;
     user.password = hashPassword;
+    user.refreshToken = this.jwtService.sign({ id: user.email });
 
     try {
       return await this.userRepository.save(user);
@@ -56,6 +57,10 @@ export class UserService {
 
   async findOne(id: number): Promise<User> {
     return await this.userRepository.findOne({ where: { id: id.toString() } });
+  }
+
+  async findById(id: string): Promise<User> {
+    return await this.userRepository.findOne({ where: { id } });
   }
 
   async update(id: number, updateUserDto: CreateUserDto): Promise<void> {
@@ -124,6 +129,8 @@ export class UserService {
       console.log('payload: ', payload);
       //Ici envoie du Token d'accés si authorisé
       const accessToken = await this.jwtService.sign(payload);
+      user.refreshToken = accessToken;
+      this.userRepository.save(user);
       console.log('accessToken: ', accessToken);
       return { accessToken };
     } else {
@@ -175,5 +182,35 @@ export class UserService {
   async generateJWT(id: number) {
     console.log('Generating JWT for user with id:', id);
     return sign({ id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+  }
+
+  async makeAdmin(id: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: id.toString() },
+    });
+    console.log('user: ', user);
+    if (!user) {
+      throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
+    }
+    user.isAdmin = true;
+    await this.userRepository.save(user);
+  }
+
+  async findByRefreshToken(refreshToken: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { refreshToken } });
+  }
+  async updateRefreshToken(id: string, refreshToken: string): Promise<void> {
+    const user = await this.userRepository.findOne({
+      where: { id: id },
+    });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    user.refreshToken = refreshToken;
+    try {
+      await this.userRepository.save(user);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

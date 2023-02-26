@@ -33,6 +33,12 @@ export class User {
   })
   refreshToken: string;
 
+  @Column({
+    type: 'boolean',
+    default: false,
+  })
+  isAdmin: boolean;
+
   @OneToMany(() => Reservation, reservation => reservation.User)
   reservation: Reservation[];
 

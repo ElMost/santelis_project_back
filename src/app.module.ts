@@ -14,6 +14,7 @@ import { Reservation } from './reservation/entities/reservation.entity';
 import { Service } from './services/entities/service.entity';
 import { User } from './user/entities/user.entity';
 import { ConfigModule } from '@nestjs/config';
+import { PostulerController } from './postuler/postuler.controller';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -37,7 +38,7 @@ import { ConfigModule } from '@nestjs/config';
     ServicesModule,
     DevisModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, PostulerController],
   providers: [AppService],
 })
 export class AppModule {}

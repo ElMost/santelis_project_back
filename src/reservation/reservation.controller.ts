@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Put,
@@ -11,13 +10,14 @@ import {
 import { ReservationService } from './reservation.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
+import { Reservation } from './entities/reservation.entity';
 
 @Controller('reservation')
 export class ReservationController {
   constructor(private readonly reservationService: ReservationService) {}
 
   @Post()
-  create(@Body() createReservationDto: CreateReservationDto) {
+  async create(@Body() createReservationDto: CreateReservationDto) {
     return this.reservationService.create(createReservationDto);
   }
 
@@ -42,5 +42,11 @@ export class ReservationController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.reservationService.delete(id);
+  }
+  @Get('/by-email/:email')
+  async getReservationsByEmail(
+    @Param('email') email: string,
+  ): Promise<Reservation[]> {
+    return this.reservationService.getAllByEmail(email);
   }
 }
