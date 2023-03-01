@@ -3,6 +3,7 @@ import {
   HttpException,
   HttpStatus,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -212,5 +213,22 @@ export class UserService {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  async updateByEmail(
+    email: string,
+    updateUserDto: CreateUserDto,
+  ): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+
+    user.nom = updateUserDto.nom;
+    user.prenom = updateUserDto.prenom;
+    user.password = updateUserDto.password;
+
+    return this.userRepository.save(user);
   }
 }

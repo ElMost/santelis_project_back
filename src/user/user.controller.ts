@@ -23,6 +23,7 @@ import { GetUser } from './get-user.decorator';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Response, Request } from 'express';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -67,26 +68,6 @@ export class UserController {
     };
   }
 
-  // async logout(user: User): Promise<User> {
-  //   console.log('user: ', user);
-  //   if (!user) {
-  //     console.log('User not found');
-  //     throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-  //   }
-  //   console.log('user: ', user);
-  //   user.refreshToken = null;
-  //   console.log('refreshToken: ', user.refreshToken);
-  //   try {
-  //     console.log('user: ', user);
-  //     await this.userRepository.save(user);
-  //     console.log('User logged out successfully');
-  //     return user;
-  //   } catch (error) {
-  //     console.log('error: ', error);
-  //     throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-  //   }
-  // }
-
   @Post('logout')
   async logout(@Res() response: Response): Promise<{ message: string }> {
     response.clearCookie('token');
@@ -95,19 +76,6 @@ export class UserController {
       message: 'success',
     };
   }
-
-  // @Post('logout')
-  // async logout(@Body() loginUserDto: LoginUserDto): Promise<User> {
-  //   console.log('logout');
-
-  //   return this.userService.logoutUser(loginUserDto);
-  //   // const user = await this.userService.findOneByEmail(loginUserDto.email);
-  //   // if (!user) {
-  //   //   throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-  //   // }
-  //   // await this.userService.logoutUser(user.id);
-  //   // return user;
-  // }
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
@@ -157,25 +125,25 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Put(':id')
+  @Put('/modify/:email')
   async update(
-    @Param('id') id: number,
-    @Body() updateUserDto: CreateUserDto,
+    @Param('email') email: string,
+    @Body() updateUserDto: UpdateUserDto,
     @GetUser() user: User,
-  ): Promise<void> {
+  ): Promise<User> {
     console.log(user);
 
     try {
-      await this.userService.update(id, {
+      const updatedUser = await this.userService.updateByEmail(email, {
         nom: updateUserDto.nom,
         prenom: updateUserDto.prenom,
         email: updateUserDto.email,
         password: updateUserDto.password,
       });
+      return updatedUser;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return this.userService.update(id, updateUserDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
