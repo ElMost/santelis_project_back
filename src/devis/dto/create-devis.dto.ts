@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEmail } from 'class-validator';
 
 export class CreateDevisDto {
   @IsString()
@@ -8,4 +8,6 @@ export class CreateDevisDto {
   @IsString()
   @IsNotEmpty()
   frequence: string;
+
+  email: string;
 }

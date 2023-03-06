@@ -13,6 +13,7 @@ import {
   Req,
   UnauthorizedException,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Headers } from '@nestjs/common';
@@ -79,10 +80,15 @@ export class UserController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
-  async findAll(@GetUser() user: User): Promise<User[]> {
-    console.log(user);
+  async findAll(@GetUser() user: User): Promise<any> {
     try {
-      return await this.userService.findAll();
+      if (this.userService.isAdmin(user.email)) {
+        return await this.userService.findAll();
+      } else {
+        return {
+          message: "you can't access to this data you are not admin",
+        };
+      }
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -125,40 +131,45 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Put('/modify/:email')
+  @Put('update')
   async update(
-    @Param('email') email: string,
-    @Body() updateUserDto: UpdateUserDto,
-    @GetUser() user: User,
-  ): Promise<User> {
-    console.log(user);
+    @Body('email') email: string,
+    @Body('updatedFields') updatedFields: any,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const user = await this.userService.findOneByEmail(email);
 
-    try {
-      const updatedUser = await this.userService.updateByEmail(email, {
-        nom: updateUserDto.nom,
-        prenom: updateUserDto.prenom,
-        email: updateUserDto.email,
-        password: updateUserDto.password,
-      });
-      return updatedUser;
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    if (!user) {
+      throw new BadRequestException('User not found');
     }
+
+    const updatedUser = await this.userService.updateByEmail(
+      user.email,
+      updatedFields,
+    );
+
+    return {
+      message: 'Account updated successfully',
+      updatedUser,
+    };
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Delete(':id')
+  @Delete('/:email')
   async delete(
-    @Param('id') id: string,
+    @Param('email') email: string,
     @GetUser() user: User,
-  ): Promise<string> {
+  ): Promise<any> {
     try {
       console.log(user);
-      await this.userService.delete(id);
+      await this.userService.delete(email);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return `Utilisateur avec l'ID ${id} supprimé avec succès`;
+    return {
+      status: 404,
+      message: `Utilisateur avec l'ID ${email} supprimé avec succès`,
+    };
   }
 
   @UseGuards(AuthGuard('jwt'))

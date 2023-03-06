@@ -26,7 +26,7 @@ export class Reservation {
 
   @Column()
   @IsDate()
-  date: Date;
+  date: string;
 
   @Column()
   heure: string;

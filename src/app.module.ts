@@ -15,6 +15,7 @@ import { Service } from './services/entities/service.entity';
 import { User } from './user/entities/user.entity';
 import { ConfigModule } from '@nestjs/config';
 import { PostulerController } from './postuler/postuler.controller';
+import { ContacterMailerController } from './contacter/contacter.mailer';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -38,7 +39,7 @@ import { PostulerController } from './postuler/postuler.controller';
     ServicesModule,
     DevisModule,
   ],
-  controllers: [AppController, PostulerController],
+  controllers: [AppController, PostulerController, ContacterMailerController],
   providers: [AppService],
 })
 export class AppModule {}

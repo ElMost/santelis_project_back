@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
-import { FileWatcherEventKind } from 'typescript';
 import { CreateDevisDto } from './dto/create-devis.dto';
 import { UpdateDevisDto } from './dto/update-devis.dto';
 import { Devis } from './entities/devis.entity';
@@ -11,12 +11,18 @@ export class DevisService {
   constructor(
     @InjectRepository(Devis)
     private devisRepository: Repository<Devis>,
+    private readonly userService: UserService,
   ) {}
 
   async create(createDevisDto: CreateDevisDto) {
     try {
-      const newDevis = this.devisRepository.create(createDevisDto);
-      const savedDevis = await this.devisRepository.save(newDevis);
+      const user = await this.userService.findOneByEmail(createDevisDto.email);
+      console.log(user);
+      const savedDevis = await this.devisRepository.save({
+        nomDesServices: createDevisDto.nomDesServices,
+        frequence: createDevisDto.frequence,
+        User: user,
+      });
       console.log('Le devis a été créé avec succès :', savedDevis);
       return savedDevis;
     } catch (error) {

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsDate, isDate, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateReservationDto {
   @IsNotEmpty()
@@ -13,7 +13,6 @@ export class CreateReservationDto {
   date: string;
 
   @IsNotEmpty()
-  @IsString()
   heure: string;
 }
 

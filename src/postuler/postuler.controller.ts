@@ -1,39 +1,58 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { createTransport } from 'nodemailer';
+import * as fs from 'fs';
 
 @Controller('postuler')
 export class PostulerController {
   @Post('send')
-  async send(@Body() formData: any) {
-    console.log(formData);
+  @UseInterceptors(FileInterceptor('attachement'))
+  async send(
+    @UploadedFile() attachement: Express.Multer.File,
+    @Body('nom') nom: string,
+    @Body('prenom') prenom: string,
+    @Body('email') email: string,
+    @Body('message') message: string,
+  ) {
+    console.log('attachment', attachement);
+    console.log('nom', nom);
+    console.log('prenom', prenom);
+    console.log('email', email);
+    console.log('message', message);
 
     const transporter = createTransport({
       service: 'gmail',
       auth: {
         user: 'mosscmoi@gmail.com',
-        pass: 'gagwjpyihkiobfoa',
+        pass: 'aiywtoueicetjzga',
       },
     });
 
-    const attachments = [];
-    for (const key in formData) {
-      if (key === 'attachment') {
-        const buffer = Buffer.from(formData[key], 'base64');
-
-        attachments.push({
-          filename: 'Attachment.png',
-          content: buffer,
-          contentType: 'image/png',
-          contentDisposition: 'attachment',
-        });
-      }
-    }
+    const attachments = [
+      {
+        filename: attachement.originalname,
+        content: fs.createReadStream(attachement.path),
+      },
+    ];
 
     const mailOptions = {
-      from: formData['email'] as string,
+      from: email as string,
       to: 'mosscmoi@gmail.com',
-      subject: `${formData['nom']} ${formData['prenom']} : Postuler Santleys`,
-      text: formData['message'] as string,
+      subject: `${nom} ${prenom} : Postuler Santelys`,
+      text: `Cher Santelys Equipe,
+      je suis ${nom} ${prenom} et je vous contacte pour postuler chez Santleys.
+      Voici mon CV et ma lettre de motivation.
+      ${message}
+      Merci de prendre en compte ma candidature.
+      Cordialement,
+      ${nom} ${prenom}`,
+
       attachments,
     };
 

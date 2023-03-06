@@ -14,6 +14,7 @@ import { User } from './entities/user.entity';
 // import { compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { LoginUserDto } from './dto/login-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -86,30 +87,29 @@ export class UserService {
     }
   }
 
-  async delete(id: string): Promise<string> {
-    console.log('id: ', id);
+  async delete(email: string): Promise<string> {
     const user = await this.userRepository.findOne({
-      where: { id: id.toString() },
+      where: { email: email },
     });
     console.log('user: ', user);
     if (!user) {
       throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
     }
     console.log('user: ', user);
-    await this.userRepository.delete(id);
-    console.log(`Utilisateur avec l'ID ${id} supprimé avec succès`);
+    await this.userRepository.delete(user.id);
+    console.log(`Utilisateur avec l'ID ${user.id} supprimé avec succès`);
     console.log('user: ', user);
     try {
-      await this.userRepository.delete(id);
-      console.log(`Utilisateur avec l'ID ${id} supprimé avec succès`);
+      await this.userRepository.delete(user.id);
+      console.log(`Utilisateur avec l'ID ${user.id} supprimé avec succès`);
     } catch (error) {
       console.log('error: ', error);
       throw new HttpException(
-        `Impossible de supprimer l'utilisateur avec l'ID ${id}`,
+        `Impossible de supprimer l'utilisateur avec l'ID ${user.id}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-    return `Utilisateur avec l'ID ${id} supprimé avec succès`;
+    return `Utilisateur avec l'ID ${user.id} supprimé avec succès`;
   }
 
   async compareHash(password: string, hash: string): Promise<boolean> {
@@ -142,6 +142,11 @@ export class UserService {
     }
   }
 
+  async isAdmin(email: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({ where: { email } });
+    return user.isAdmin;
+  }
+
   async logoutUser(userId: number): Promise<User> {
     console.log('userId: ', userId);
     const user = await this.findOne(userId);
@@ -162,7 +167,6 @@ export class UserService {
       console.log('error: ', error);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    console.log('User logged out successfully');
   }
 
   async validateUser(email: string, password: string): Promise<User> {
@@ -217,18 +221,23 @@ export class UserService {
 
   async updateByEmail(
     email: string,
-    updateUserDto: CreateUserDto,
-  ): Promise<User> {
+    updateUserDto: UpdateUserDto,
+  ): Promise<unknown> {
     const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user) {
       throw new NotFoundException(`User with email ${email} not found`);
     }
-
-    user.nom = updateUserDto.nom;
-    user.prenom = updateUserDto.prenom;
-    user.password = updateUserDto.password;
-
-    return this.userRepository.save(user);
+    try {
+      user.nom = updateUserDto.nom;
+      user.prenom = updateUserDto.prenom;
+      user.email = updateUserDto.email;
+      const updatedUser = this.userRepository.save(user);
+      if (updatedUser) {
+        return updatedUser;
+      }
+    } catch (err) {
+      return err;
+    }
   }
 }
