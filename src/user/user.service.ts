@@ -4,6 +4,7 @@ import {
   HttpStatus,
   UnauthorizedException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,12 +16,14 @@ import { User } from './entities/user.entity';
 import { sign } from 'jsonwebtoken';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { MailerService } from './mailerService.service';
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private jwtService: JwtService,
+    private mailerService: MailerService,
   ) {}
 
   async registerUser(createUserDto: CreateUserDto) {
@@ -239,5 +242,33 @@ export class UserService {
     } catch (err) {
       return err;
     }
+  }
+
+  async updatePassword(userId: string, updatePasswordDto: any): Promise<User> {
+    console.log(updatePasswordDto);
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found.`);
+    }
+
+    const salt = await bcrypt.genSalt();
+    user.password = await bcrypt.hash(updatePasswordDto, salt);
+
+    return await this.userRepository.save(user);
+  }
+
+  async sendNewPasswordEmail(
+    email: string,
+    newPassword: string,
+  ): Promise<void> {
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Your new password',
+      context: {
+        name: 'Dear User',
+        password: newPassword,
+      },
+    });
   }
 }

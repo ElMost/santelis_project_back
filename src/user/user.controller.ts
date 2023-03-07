@@ -123,11 +123,28 @@ export class UserController {
   }
 
   @Post('/forgot-password')
-  async ResetPassword(@Body() email: string, @Res() response: Response) {
+  async resetPassword(
+    @Param('email') email: string,
+    @Res() response: Response,
+  ) {
     const user = await this.userService.findOneByEmail(email);
+
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
+    // Generate a new random password
+    let newPassword = Math.random().toString(36).slice(-8);
+    newPassword =
+      newPassword.replace(/[a-z]/, () =>
+        String.fromCharCode(Math.floor(Math.random() * 26) + 65),
+      ) + '.';
+    // Update the user's password
+    await this.userService.updatePassword(user.id, newPassword);
+    // Send the new password to the user's email
+    await this.userService.sendNewPasswordEmail(user.email, newPassword);
+    return response.status(HttpStatus.OK).json({
+      message: 'A new password has been sent to your email address',
+    });
   }
 
   @UseGuards(AuthGuard('jwt'))
