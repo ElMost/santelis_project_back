@@ -42,10 +42,10 @@ export class ServicesService {
     }
   }
   // Fonction pour récupérer un service en fonction de son identifiant
-  async findOne(id: number): Promise<Service> {
+  async findOne(id: string): Promise<Service> {
     try {
       // Conversion de l'identifiant en string
-      const serviceId = id.toString();
+      const serviceId = id;
       // Récupération du service dans la base de données en fonction de son identifiant
       const service = await this.serviceRepository.findOneBy({ id: serviceId });
       // Retourne le service
@@ -57,12 +57,12 @@ export class ServicesService {
   }
 
   async update(
-    id: number,
+    id: string,
     updateServiceDto: UpdateServiceDto,
   ): Promise<Service> {
     try {
       // Conversion de l'identifiant en chaîne
-      const stringId = id.toString();
+      const stringId = id;
       // Récupération du service dans la base de données en fonction de son identifiant
       const service = await this.serviceRepository.findOne({
         where: { id: stringId },

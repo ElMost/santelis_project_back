@@ -40,7 +40,7 @@ export class UserService {
     user.refreshToken = this.jwtService.sign({ id: user.email });
 
     try {
-      return await this.userRepository.save(user);
+      return this.userRepository.save(user);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -60,19 +60,19 @@ export class UserService {
     return await this.userRepository.find();
   }
 
-  async findOne(id: number): Promise<User> {
-    return await this.userRepository.findOne({ where: { id: id.toString() } });
+  async findOne(id: string): Promise<User> {
+    return await this.userRepository.findOne({ where: { id: id } });
   }
 
   async findById(id: string): Promise<User> {
     return await this.userRepository.findOne({ where: { id } });
   }
 
-  async update(id: number, updateUserDto: CreateUserDto): Promise<void> {
+  async update(id: string, updateUserDto: CreateUserDto): Promise<void> {
     const { nom, prenom, email, password } = updateUserDto;
 
     const user = await this.userRepository.findOne({
-      where: { id: id.toString() },
+      where: { id: id },
     });
 
     if (!user) {
@@ -150,7 +150,7 @@ export class UserService {
     return user.isAdmin;
   }
 
-  async logoutUser(userId: number): Promise<User> {
+  async logoutUser(userId: string): Promise<User> {
     console.log('userId: ', userId);
     const user = await this.findOne(userId);
     console.log('user: ', user);
@@ -187,14 +187,14 @@ export class UserService {
     return user;
   }
 
-  async generateJWT(id: number) {
+  async generateJWT(id: string) {
     console.log('Generating JWT for user with id:', id);
     return sign({ id }, process.env.SECRET_KEY, { expiresIn: '1h' });
   }
 
   async makeAdmin(id: string) {
     const user = await this.userRepository.findOne({
-      where: { id: id.toString() },
+      where: { id: id },
     });
     console.log('user: ', user);
     if (!user) {

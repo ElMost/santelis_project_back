@@ -31,14 +31,14 @@ export class ServicesController {
 
   // Endpoint pour la récupération d'un service en fonction de son identifiant
   @Get(':id')
-  async findOne(@Param('id') id: number) {
+  async findOne(@Param('id') id: string) {
     return await this.servicesService.findOne(id);
   }
 
   // Endpoint pour la mise à jour d'un service
   @Put(':id')
   async update(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() updateServiceDto: UpdateServiceDto,
   ) {
     return await this.servicesService.update(id, updateServiceDto);

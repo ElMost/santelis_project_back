@@ -46,8 +46,8 @@ export class PostulerController {
       to: 'mosscmoi@gmail.com',
       subject: `${nom} ${prenom} : Postuler Santelys`,
       text: `Cher Santelys Equipe,
-      je suis ${nom} ${prenom} et je vous contacte pour postuler chez Santleys.
-      Voici mon CV et ma lettre de motivation.
+      je suis ${nom} ${prenom} et je vous contacte pour postuler chez Santélys.
+      Voici mon CV.
       ${message}
       Merci de prendre en compte ma candidature.
       Cordialement,

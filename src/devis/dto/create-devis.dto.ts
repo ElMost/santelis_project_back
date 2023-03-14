@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsEmail } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 export class CreateDevisDto {
   @IsString()

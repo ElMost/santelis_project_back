@@ -96,7 +96,7 @@ export class UserController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
-  async findOne(@Param('id') id: number, @GetUser() user: User): Promise<User> {
+  async findOne(@Param('id') id: string, @GetUser() user: User): Promise<User> {
     console.log(user);
 
     try {
