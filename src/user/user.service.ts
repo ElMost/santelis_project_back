@@ -57,15 +57,23 @@ export class UserService {
   }
 
   async findAll(): Promise<User[]> {
-    return await this.userRepository.find();
+    return await this.userRepository.find({
+      select: ['nom', 'prenom', 'email', 'isAdmin'],
+    });
   }
 
   async findOne(id: string): Promise<User> {
-    return await this.userRepository.findOne({ where: { id: id } });
+    return await this.userRepository.findOne({
+      where: { id: id },
+      select: ['nom', 'prenom', 'email', 'isAdmin'],
+    });
   }
 
   async findById(id: string): Promise<User> {
-    return await this.userRepository.findOne({ where: { id } });
+    return await this.userRepository.findOne({
+      where: { id },
+      select: ['nom', 'prenom', 'email', 'isAdmin'],
+    });
   }
 
   async update(id: string, updateUserDto: CreateUserDto): Promise<void> {
@@ -147,6 +155,7 @@ export class UserService {
 
   async isAdmin(email: string): Promise<boolean> {
     const user = await this.userRepository.findOne({ where: { email } });
+    console.log('from verifiey isAdmin: ', user.isAdmin);
     return user.isAdmin;
   }
 

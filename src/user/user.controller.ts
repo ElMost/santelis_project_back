@@ -80,9 +80,13 @@ export class UserController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
-  async findAll(@GetUser() user: User): Promise<any> {
+  async findAll(@GetUser() user: User): Promise<unknown> {
     try {
-      if (this.userService.isAdmin(user.email)) {
+      console.log('from user admin', user);
+      const isAdmin = await this.userService.isAdmin(user.email);
+      if (isAdmin) {
+        console.log('from is admin ', isAdmin);
+        console.log(this.userService.isAdmin(user.email));
         return await this.userService.findAll();
       } else {
         return {

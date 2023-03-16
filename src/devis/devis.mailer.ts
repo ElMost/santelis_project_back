@@ -11,7 +11,7 @@ export class DevisMailerController {
       service: 'gmail',
       auth: {
         user: 'mosscmoi@gmail.com',
-        pass: 'aiywtoueicetjzga',
+        pass: 'xgjkhdrzugqmabrd',
       },
     });
 

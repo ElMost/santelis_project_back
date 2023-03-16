@@ -20,17 +20,11 @@ export class PostulerController {
     @Body('email') email: string,
     @Body('message') message: string,
   ) {
-    console.log('attachment', attachement);
-    console.log('nom', nom);
-    console.log('prenom', prenom);
-    console.log('email', email);
-    console.log('message', message);
-
     const transporter = createTransport({
       service: 'gmail',
       auth: {
         user: 'mosscmoi@gmail.com',
-        pass: 'aiywtoueicetjzga',
+        pass: 'xgjkhdrzugqmabrd',
       },
     });
 
