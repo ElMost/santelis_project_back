@@ -21,18 +21,18 @@ export class DevisMailerController {
       from: formData['email'] as string,
       to: 'mosscmoi@gmail.com',
       subject: `${formData['nom']} ${formData['prenom']} : Devis Santleys`,
-      text: `Dear Mosscmoi Team,
+      text: `Bonjour,
 
-I am writing to get a quote for the following services: ${services}
+Je vous contacte pour un devis pour les services suivants : ${services}
 
 Frequency: ${formData['frequency'] as string}
 
-Name: ${formData['nom'] as string}
-First Name: ${formData['prenom'] as string}
+Nom: ${formData['nom'] as string}
+Prénom: ${formData['prenom'] as string}
 Email: ${formData['email'] as string}
-Postal Code: ${formData['codePostal'] as string}
+Code Postal: ${formData['codePostal'] as string}
 
-Best regards,
+Merci de me recontacter au plus vite.
 `,
     };
 

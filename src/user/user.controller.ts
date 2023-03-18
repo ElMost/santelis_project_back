@@ -10,25 +10,20 @@ import {
   Put,
   Delete,
   Res,
-  Req,
-  UnauthorizedException,
-  Query,
   BadRequestException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { Headers } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { GetUser } from './get-user.decorator';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
-  userRepository: any;
   constructor(
     private readonly userService: UserService,
     private jwtService: JwtService,
@@ -55,18 +50,16 @@ export class UserController {
     @Body() loginUserDto: LoginUserDto,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const user = await this.userService.findOneByEmail(loginUserDto.email);
-    if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    try {
+      const accessToken = await this.userService.loginUser(loginUserDto);
+      response.cookie('token', accessToken, { httpOnly: true });
+      return {
+        message: 'Login successful',
+        token: accessToken,
+      };
+    } catch (error) {
+      throw new BadRequestException('Invalid credentials');
     }
-    console.log(user);
-    const token = this.jwtService.sign({ id: user.email });
-    await this.userService.updateRefreshToken(user.id, token);
-    response.cookie('token', token, { httpOnly: true });
-    return {
-      message: 'Login successful',
-      token: token,
-    };
   }
 
   @Post('logout')
@@ -79,8 +72,10 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get()
-  async findAll(@GetUser() user: User): Promise<unknown> {
+  @Post()
+  async findAll(@Body('token') token: string): Promise<unknown> {
+    const res = this.jwtService.verify(token);
+    const user = await this.userService.findOne(res.id);
     try {
       console.log('from user admin', user);
       const isAdmin = await this.userService.isAdmin(user.email);
@@ -154,11 +149,10 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @Put('update')
   async update(
-    @Body('email') email: string,
-    @Body('updatedFields') updatedFields: any,
-    @Res({ passthrough: true }) response: Response,
+    @Body('id') id: string,
+    @Body('updatedFields') updatedFields: UpdateUserDto,
   ) {
-    const user = await this.userService.findOneByEmail(email);
+    const user = await this.userService.findById(id);
 
     if (!user) {
       throw new BadRequestException('User not found');
@@ -177,10 +171,7 @@ export class UserController {
 
   @UseGuards(AuthGuard('jwt'))
   @Delete('/:email')
-  async delete(
-    @Param('email') email: string,
-    @GetUser() user: User,
-  ): Promise<any> {
+  async delete(@Param('email') email: string, @GetUser() user: User) {
     try {
       console.log(user);
       await this.userService.delete(email);

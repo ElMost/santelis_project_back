@@ -1,6 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { CreateReservationDto } from './dto/create-reservation.dto';
@@ -32,16 +31,13 @@ export class ReservationService {
         ...createReservationDto,
         User: user,
       });
-      // console.log('newReservation', newReservation);
+
       const savedReservation = await this.reservationRepository.save(
         newReservation,
       );
 
-      console.log('savedReservation', savedReservation);
       return newReservation;
-    } catch (error) {
-      console.log('error', error);
-    }
+    } catch (error) {}
   }
 
   async findAll() {
@@ -106,11 +102,10 @@ export class ReservationService {
         ...updateReservationDto,
       });
 
-      console.log('La reservation a été mise à jour', updatedReservation);
       return updatedReservation;
     } catch (error) {
       // si une erreur survient, on la log et on renvoie un message d'erreur
-      console.log('Erreur lors de la mise à jour de la reservation', error);
+
       throw new Error(`Reservation avec l'ID ${id} introuvable`);
     }
   }
@@ -126,16 +121,16 @@ export class ReservationService {
         // si la reservation n'existe pas, on renvoie un message d'erreur
         throw new Error(`Reservation avec l'ID ${id} introuvable`);
       }
-      console.log('reservation', reservation);
+
       // si la reservation existe, on la supprime
       const deletedReservation = await this.reservationRepository.delete({
         id,
       });
-      console.log('La reservation a été supprimée', deletedReservation);
+
       return deletedReservation;
     } catch (error) {
       // si une erreur survient, on la log et on renvoie un message d'erreur
-      console.log('Erreur lors de la suppression de la reservation', error);
+
       throw new Error(`Reservation avec l'ID ${id} introuvable`);
     }
   }

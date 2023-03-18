@@ -58,7 +58,7 @@ export class UserService {
 
   async findAll(): Promise<User[]> {
     return await this.userRepository.find({
-      select: ['nom', 'prenom', 'email', 'isAdmin'],
+      select: ['id', 'nom', 'prenom', 'email', 'isAdmin'],
     });
   }
 
@@ -127,35 +127,31 @@ export class UserService {
     return await bcrypt.compare(password, hash);
   }
 
-  async loginUser(
-    loginUserDto: LoginUserDto,
-  ): Promise<{ accessToken: string }> {
-    console.log('loginUserDto: ', loginUserDto);
+  async loginUser(loginUserDto: LoginUserDto): Promise<string> {
     const { email, password } = loginUserDto;
-    console.log('email: ', email);
 
     const user = await this.userRepository.findOne({ where: { email } });
-    if (user && (await bcrypt.compare(password, user.password))) {
-      console.log('user profile: ', user);
-      const payload = { user };
-      console.log('payload: ', payload);
-      //Ici envoie du Token d'accés si authorisé
-      const accessToken = await this.jwtService.sign(payload);
-      user.refreshToken = accessToken;
-      this.userRepository.save(user);
-      console.log('accessToken: ', accessToken);
-      return { accessToken };
-    } else {
-      console.log('Invalid credentials');
-      throw new UnauthorizedException(
-        'Le couple email/password est incorrect!',
-      );
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
     }
+
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const payload = { id: user.id };
+    const accessToken = this.jwtService.sign(payload);
+
+    user.refreshToken = accessToken;
+    await this.userRepository.save(user);
+
+    return accessToken;
   }
 
   async isAdmin(email: string): Promise<boolean> {
     const user = await this.userRepository.findOne({ where: { email } });
-    console.log('from verifiey isAdmin: ', user.isAdmin);
+    console.log('from verify isAdmin: ', user.isAdmin);
     return user.isAdmin;
   }
 
@@ -196,10 +192,10 @@ export class UserService {
     return user;
   }
 
-  async generateJWT(id: string) {
+  /*   async generateJWT(id: string) {
     console.log('Generating JWT for user with id:', id);
     return sign({ id }, process.env.SECRET_KEY, { expiresIn: '1h' });
-  }
+  } */
 
   async makeAdmin(id: string) {
     const user = await this.userRepository.findOne({

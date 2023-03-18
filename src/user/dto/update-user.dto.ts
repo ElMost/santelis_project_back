@@ -4,21 +4,22 @@ import {
   IsEmail,
   MinLength,
   Matches,
+  IsOptional,
 } from 'class-validator';
 
 export class UpdateUserDto {
   @IsNotEmpty()
   @IsString()
-  @Matches(/^[a-zA-Z]+$/gm, {
-    message: 'Le nom ne doit contenir que des lettres',
-  })
+  // @Matches(/^[a-zA-Z]+$/gm, {
+  //   message: 'Le nom ne doit contenir que des lettres',
+  // })
   nom: string;
 
   @IsNotEmpty()
   @IsString()
-  @Matches(/^[a-zA-Z]+$/gm, {
-    message: 'Le prenom ne doit contenir que des lettres',
-  })
+  // @Matches(/^[a-zA-Z]+$/gm, {
+  //   message: 'Le prenom ne doit contenir que des lettres',
+  // })
   prenom: string;
 
   @IsNotEmpty()
@@ -27,6 +28,7 @@ export class UpdateUserDto {
 
   @IsNotEmpty()
   @MinLength(8)
+  @IsOptional()
   @Matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).{6,64}$/gm, {
     message:
       'mot de passe doit contenir au moins 8 caractères, une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial',
