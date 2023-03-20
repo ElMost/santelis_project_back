@@ -5,7 +5,7 @@ import { AppModule } from './app.module';
 
 const corsOptions: CorsOptions = {
   // origin: 'http://localhost:3000',
-  origin: [/^(https?:\/\/)?localhost(:\d+)?$/],
+  origin: [/^(https?:\/\/)?localhost(:\d+)?$/, 'https://santelys.vercel.app'],
 
   credentials: true,
 };

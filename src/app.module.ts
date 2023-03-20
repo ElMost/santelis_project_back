@@ -26,13 +26,33 @@ import { ContacterMailerController } from './contacter/contacter.mailer';
     // TypeOrmModule.forFeature([Image]),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST,
+      /*  host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT),
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       entities: [User, Reservation, Service, Devis],
+      synchronize: process.env.MODE === 'DEV' ? true : false, */
+      ssl: {
+        rejectUnauthorized: false,
+      }, // disable SSL
+      host:
+        process.env.MODE === 'DEV'
+          ? process.env.DB_HOST
+          : process.env.PROD_HOST,
+      username:
+        process.env.MODE === 'DEV'
+          ? process.env.DB_USERNAME
+          : process.env.PROD_USERNAME,
+      password:
+        process.env.MODE === 'DEV'
+          ? process.env.DB_PASSWORD
+          : process.env.PROD_PASS,
+      database: 'santelys',
+      url: process.env.PROD_URL || undefined,
       synchronize: process.env.MODE === 'DEV' ? true : false,
+
+      entities: [User, Reservation, Service, Devis],
     }),
     UserModule,
     ReservationModule,
