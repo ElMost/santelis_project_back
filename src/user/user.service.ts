@@ -62,13 +62,6 @@ export class UserService {
     });
   }
 
-  async findOne(id: string): Promise<User> {
-    return await this.userRepository.findOne({
-      where: { id: id },
-      select: ['nom', 'prenom', 'email', 'isAdmin'],
-    });
-  }
-
   async findById(id: string): Promise<User> {
     return await this.userRepository.findOne({
       where: { id },
@@ -157,7 +150,7 @@ export class UserService {
 
   async logoutUser(userId: string): Promise<User> {
     console.log('userId: ', userId);
-    const user = await this.findOne(userId);
+    const user = await this.findById(userId);
     console.log('user: ', user);
     if (!user) {
       console.log('User not found');
@@ -240,6 +233,7 @@ export class UserService {
       user.nom = updateUserDto.nom;
       user.prenom = updateUserDto.prenom;
       user.email = updateUserDto.email;
+      user.isAdmin = updateUserDto.isAdmin;
       const updatedUser = this.userRepository.save(user);
       if (updatedUser) {
         return updatedUser;

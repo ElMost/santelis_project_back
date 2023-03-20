@@ -75,7 +75,7 @@ export class UserController {
   @Post()
   async findAll(@Body('token') token: string): Promise<unknown> {
     const res = this.jwtService.verify(token);
-    const user = await this.userService.findOne(res.id);
+    const user = await this.userService.findById(res.id);
     try {
       console.log('from user admin', user);
       const isAdmin = await this.userService.isAdmin(user.email);
@@ -95,11 +95,14 @@ export class UserController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
-  async findOne(@Param('id') id: string, @GetUser() user: User): Promise<User> {
+  async findById(
+    @Param('id') id: string,
+    @GetUser() user: User,
+  ): Promise<User> {
     console.log(user);
 
     try {
-      return await this.userService.findOne(id);
+      return await this.userService.findById(id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -107,7 +110,7 @@ export class UserController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('email/:email')
-  async findOneByEmail(
+  async findByIdByEmail(
     @Param('email') email: string,
     @GetUser() user: User,
   ): Promise<User> {
@@ -163,6 +166,7 @@ export class UserController {
       updatedFields,
     );
 
+    console.log(updatedUser);
     return {
       message: 'Account updated successfully',
       updatedUser,

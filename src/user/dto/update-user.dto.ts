@@ -5,6 +5,7 @@ import {
   MinLength,
   Matches,
   IsOptional,
+  IsBoolean,
 } from 'class-validator';
 
 export class UpdateUserDto {
@@ -34,4 +35,8 @@ export class UpdateUserDto {
       'mot de passe doit contenir au moins 8 caractères, une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial',
   })
   password: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isAdmin: boolean;
 }
